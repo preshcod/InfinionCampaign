@@ -1,5 +1,5 @@
 import React from 'react'
-import overimage from "../../public/assets/overImage.png"
+import overimage from "/assets/overImage.png"
 import {FaPlus} from "react-icons/fa6";
 
 const Overview = () => {

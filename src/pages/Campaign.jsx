@@ -2,10 +2,17 @@ import { useState,useEffect } from "react";
 import { IoIosSearch } from "react-icons/io";
 import { FaEdit, FaTrash,FaRegEye } from "react-icons/fa";
 import axios from 'axios'
+import { dateFormat } from "../services/utils";
+import Modal from "../components/Modal";
 
 const Campaign = () => {
 
-  const [allCampaign,setAllCampaign] = useState([])
+  const [allCampaign,setAllCampaign] = useState([]);
+  const [isModal,setIsModal] = useState(false)
+  const [campaignId,setCamapaignId] = useState("")
+  // const [currentPage, setCurrentPage] = useState(2);
+
+  // const itemsPerPage = 10;
 
   const fetchAllCampaign = async () => {
       try {
@@ -30,17 +37,20 @@ const Campaign = () => {
     }
   }
 
+  // const totalPages = Math.ceil(allCampaign?.length / itemsPerPage);
 
-  function dateFormat(date) {
-    const today = new Date(date)
-    const yr = today.getFullYear()
-    const m = today.getMonth()
-    const d = today.getDate()
-    const day = d < 10 ? `0${d}`: d
-    const fmt = `${day}/${m+1 < 10 ? `0${m +1}`: m + 1}/${yr}`
-    // console.log(fmt);
-    return fmt;
-}
+    // const handleClick = (page) => {
+    //     setCurrentPage(page);
+    // };
+
+    // const getPaginatedItems = () => {
+    //     const startIndex = (currentPage - 1) * itemsPerPage;
+    //     const endIndex = startIndex + itemsPerPage;
+    //     return allCampaign.length > 0 && allCampaign.slice(startIndex, endIndex);
+    // };
+
+    // console.log(getPaginatedItems());
+
 
 const inActiveCampaign = allCampaign.length > 0 ? (
   allCampaign.filter(campaign => campaign.campaignStatus.toLowerCase() !== 'inactive')
@@ -49,10 +59,14 @@ const activeCampaign = allCampaign.length > 0 ? (
   allCampaign.filter(campaign => campaign.campaignStatus.toLowerCase() === 'inactive')
 ) : []
 
-console.log(activeCampaign);
+
+// const content = allCampaign.length > 0 && getPaginatedItems().slice(0,4).map((pg,idx)=>{
+//   return <button className={` text-white flex items-center justify-center rounded-full h-[24px] w-[24px] ${idx + 1 === currentPage ? 'font-bold bg-[#247B7B]' : 'bg-slate-600'}`} key={idx}>{idx + 1}</button>
+// })
 
   return (
     <section>
+      {isModal && <Modal  setIsModal={setIsModal} campaignId={campaignId} deleteCampaign={deleteCampaign}/>}
     <h2 className='text-[#247b7b] text-2xl font-semibold mx-5'>All Campaigns</h2>
 
     <div className="border-2   px-[50px] py-4">
@@ -96,12 +110,15 @@ console.log(activeCampaign);
                             <td className="py-2 px-10">{idx + 1}</td>
                             <td className="py-2 px-10">{campaignName}</td>
                             <td className="py-2 px-10">{dateFormat(startDate)}</td>
-                            <td className="py-2 px-10">{campaignStatus}</td>
+                            <td className={`py-2 px-10 font-semibold ${campaignStatus.toLowerCase() === "inactive" ? 'text-red-700' : 'text-green-700'}`}>{campaignStatus}</td>
 
                             <td className="py-2 px-10 flex items-center gap-2">
                                 <FaRegEye className="cursor-pointer"/>
                                 <FaEdit className="cursor-pointer"/>
-                                <FaTrash className="cursor-pointer" onClick={()=>deleteCampaign(id)}/>
+                                <FaTrash className="cursor-pointer" onClick={()=>{
+                                  setIsModal(true)
+                                  setCamapaignId(id)
+                                } }/>
                             </td>
                         </tr>
                                 )
@@ -111,16 +128,23 @@ console.log(activeCampaign);
                </tbody>
             
              
-              
-               
-        
-               
-               
             </table>
         </div>
+
+        {/** pagination*/}
+
+       {/* {allCampaign.length > 0 ? (
+        <div className="flex items-center justify-center gap-4 my-4">
+          <button disabled={currentPage === 1} className={`bg-gray-500 ${currentPage === 1 ? 'cursor-not-allowed opacity-[.5]' : 'opacity-[1]'}`}>Prev</button>
+          {content}
+          <button className={`bg-gray-500 ${currentPage === allCampaign.length ? 'cursor-not-allowed opacity-[.5]' : 'opacity-[1]'}`}>Next</button>
+        </div>
+       ) :null} */}
     </div>
+
+    
 </section>
   )
 }
 
-export default Campaign
+export default Campaign;
